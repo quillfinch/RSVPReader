@@ -43,15 +43,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.quillfinch.rsvpreader.data.ReaderSettings
 import com.quillfinch.rsvpreader.data.SettingsRepository
+import com.quillfinch.rsvpreader.rsvp.Tokenizer
 import kotlin.math.roundToInt
 
 @Composable
@@ -170,14 +167,12 @@ fun HomeScreen(
                     .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(color = Color(settings.textColor))) { append("read") }
-                        withStyle(SpanStyle(color = Color(settings.focusColor), fontWeight = FontWeight.Bold)) { append("i") }
-                        withStyle(SpanStyle(color = Color(settings.textColor))) { append("ng") }
-                    },
+                PivotWord(
+                    text = "reading",
+                    orpIndex = Tokenizer.orpIndex("reading"),
                     fontSize = 28.sp,
-                    fontFamily = FontFamily.Monospace,
+                    textColor = Color(settings.textColor),
+                    focusColor = Color(settings.focusColor),
                 )
             }
 

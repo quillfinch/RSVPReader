@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
@@ -48,13 +47,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
@@ -62,7 +54,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.quillfinch.rsvpreader.ReaderState
 import com.quillfinch.rsvpreader.data.ReaderSettings
-import com.quillfinch.rsvpreader.rsvp.Word
 import kotlin.math.roundToInt
 
 @Composable
@@ -107,8 +98,10 @@ fun ReaderScreen(
         }
 
         state.word?.let { word ->
-            RsvpWord(
-                word = word,
+            PivotWord(
+                text = word.text,
+                orpIndex = word.orpIndex,
+                fontSize = 64.sp,
                 textColor = textColor,
                 focusColor = focusColor,
                 modifier = Modifier.align(Alignment.Center),
@@ -155,39 +148,6 @@ fun ReaderScreen(
             )
         }
     }
-}
-
-/** Draws the word with its focus (ORP) letter held exactly at the center of the screen. */
-@Composable
-private fun RsvpWord(
-    word: Word,
-    textColor: Color,
-    focusColor: Color,
-    modifier: Modifier = Modifier,
-) {
-    val measurer = rememberTextMeasurer()
-    val style = remember(textColor) {
-        TextStyle(
-            fontSize = 64.sp,
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.Medium,
-            color = textColor,
-        )
-    }
-    val charWidth = measurer.measure("M", style).size.width
-    val annotated = remember(word.text, textColor, focusColor) {
-        buildAnnotatedString {
-            withStyle(SpanStyle(color = textColor)) { append(word.text.substring(0, word.orpIndex)) }
-            withStyle(SpanStyle(color = focusColor, fontWeight = FontWeight.Bold)) { append(word.text[word.orpIndex]) }
-            withStyle(SpanStyle(color = textColor)) { append(word.text.substring(word.orpIndex + 1)) }
-        }
-    }
-    Text(
-        text = annotated,
-        style = style,
-        maxLines = 1,
-        modifier = modifier.offset { IntOffset(-(word.orpIndex * charWidth + charWidth / 2), 0) },
-    )
 }
 
 @Composable

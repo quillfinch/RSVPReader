@@ -84,7 +84,7 @@ class ReaderViewModel(application: Application) : AndroidViewModel(application) 
 
     fun restart() {
         pause()
-        _reader.update { it.copy(index = 0, finished = false) }
+        moveTo(0)
     }
 
     fun pause() {
@@ -96,8 +96,7 @@ class ReaderViewModel(application: Application) : AndroidViewModel(application) 
     fun setIndexFromFraction(fraction: Float) {
         pause()
         if (words.isEmpty()) return
-        val target = (fraction * words.lastIndex).toInt().coerceIn(0, words.lastIndex)
-        _reader.update { it.copy(index = target, finished = false) }
+        moveTo((fraction * words.lastIndex).toInt())
     }
 
     fun skipSentences(delta: Int) {
@@ -109,7 +108,7 @@ class ReaderViewModel(application: Application) : AndroidViewModel(application) 
         } else {
             sentenceStarts.lastOrNull { it < from } ?: 0
         }
-        _reader.update { it.copy(index = target, finished = false) }
+        moveTo(target)
     }
 
     fun setWpm(value: Int) {
@@ -126,6 +125,13 @@ class ReaderViewModel(application: Application) : AndroidViewModel(application) 
 
     fun clearError() {
         error.value = null
+    }
+
+    /** Jumps to [target] while paused, keeping the shown word in sync with the index. */
+    private fun moveTo(target: Int) {
+        if (words.isEmpty()) return
+        val index = target.coerceIn(0, words.lastIndex)
+        _reader.update { it.copy(index = index, word = words[index], finished = false) }
     }
 
     private fun play() {
